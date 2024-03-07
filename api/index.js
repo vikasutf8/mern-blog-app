@@ -5,6 +5,7 @@ dotenv.config()
 const app = express();
 
 import userRoutes  from './routes/user.route.js'
+import authRoutes from './routes/auth.route.js'
 
 
 mongoose.connect(process.env.MONGO_URI)
@@ -14,9 +15,9 @@ mongoose.connect(process.env.MONGO_URI)
         .catch(err=>{
             console.log("Error in connections of DB : ",err)
         })
-
+app.use(express.json())
 app.use('/api/user',userRoutes)
-
+app.use('/api/auth',authRoutes)
 
 app.listen(3000,()=>{
     console.log('Server is running on port 3000')
