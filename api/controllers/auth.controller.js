@@ -45,24 +45,15 @@ export const signin = async (req, res, next) => {
   try {
     const validUser = await User.findOne({ email });
     if (!validUser) {
-    //   console.log("invalid 1");
       return next(errorHandler(404, "Invalid User"));
-    //   console.log("invalid 2");
     }
     const validPassword = brcypt.compareSync(password, validUser.password);
     if (!validPassword) {
-    //   console.log("invalid 3");
-      return next(errorHandler(404, "Invalid password"));
-    //   console.log("invalid 4");
+      return next(errorHandler(400, "Invalid password"));
     }
 
     // if everthing is create then auth,/token generate
-    const token = jwt.sign(
-      {
-        id: validUser._id,
-      },
-      process.env.JWT_SECRET
-    );
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
 
     const { password: pass, ...rest } = validUser._doc;
 
@@ -72,7 +63,7 @@ export const signin = async (req, res, next) => {
         httpOnly: true,
       })
       .json(rest);
-  } catch (error) {
-    next("this went in catch part :: ", error);
+  } catch (err) {
+    return next("this went in catch part :: \n ", err);
   }
 };
