@@ -20,7 +20,7 @@ export default function App() {
       <Route path="/sign-in" element={<SignIn/>}/>
       <Route path="/sign-up" element={<SignUp />}/>
 
-      <Route element={PirvateRoute}>
+      <Route element={<PirvateRoute/>}>
       <Route path="/dashboard" element={<Dashboard/>}/>
       </Route>
       
