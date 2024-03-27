@@ -7,6 +7,7 @@ import Projects from "./pages/Projects"
 import About from "./pages/About"
 import Headers from "./components/Header"
 import Footers from "./components/Footer"
+import PirvateRoute from "./components/PirvateRoute"
 
 
 export default function App() {
@@ -18,7 +19,11 @@ export default function App() {
       <Route path="/about" element={<About/>}/>
       <Route path="/sign-in" element={<SignIn/>}/>
       <Route path="/sign-up" element={<SignUp />}/>
+
+      <Route element={PirvateRoute}>
       <Route path="/dashboard" element={<Dashboard/>}/>
+      </Route>
+      
       <Route path="/projects" element={<Projects/>}/>
       
     </Routes>  
