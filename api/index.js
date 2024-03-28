@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import cookieParser from "cookie-parser";
 dotenv.config()
 const app = express();
 
@@ -27,6 +28,7 @@ mongoose.connect(process.env.MONGO_URI)
         })
         
         app.use(express.json())
+        app.use(cookieParser())
         app.use('/api/user',userRoutes)
         app.use('/api/auth',authRoutes)
 app.listen(3000,()=>{
