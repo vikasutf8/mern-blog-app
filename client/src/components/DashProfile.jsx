@@ -7,7 +7,8 @@ import { app } from "../firebase";
 // styling of circular progress bar around the picture uploaded -react liberary
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
+import { updateStart,updateSuccess,updatefailure } from "../redux/user/userSlice";
+import { useDispatch } from "react-redux";
 
 export default function DashProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -17,6 +18,9 @@ export default function DashProfile() {
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const filePickerRef = useRef();
+  const dispatch = useDispatch();
+const [formData, setFormData] = useState({})
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -59,14 +63,52 @@ export default function DashProfile() {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileUrl(downloadURL);
+          // here we can update the user profile picture
+          setFormData({...formData, profilePicture: downloadURL})
         });
       }
     );
   };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  }
+
+  const handleSubmit =async (e) => {
+    e.preventDefault();
+    // console.log(formData)
+    if(Object.keys(formData).length === 0){
+        return;
+    }
+    try {
+      dispatch(updateStart());
+      const res =await fetch(`/api/user/update/${currentUser._id}`,{ 
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json', 
+           },  
+          body: JSON.stringify(formData),
+      })
+      const data =await res.json();
+      if(!res.ok){
+          dispatch(updatefailure(data.message))
+          return;
+      }else{
+        dispatch(updateSuccess(data));
+
+      }
+    } catch (error) {
+      dispatch(updatefailure(error.message))
+    }
+  }
+
+  console.log(formData)
   return (
     <div className="max-w-lg p-3 w-full mx-auto">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
-      <form className="flex flex-col gap-4 w-80">
+      <form 
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4 w-80">
         <input
           type="file"
           accept="image/*"
@@ -111,14 +153,20 @@ export default function DashProfile() {
           id="username"
           placeholder="username"
           defaultValue={currentUser.username}
+          onChange={handleChange}
         />
         <TextInput
           type="email"
           id="email"
           placeholder="email"
           defaultValue={currentUser.email}
+          onChange={handleChange}
         />
-        <TextInput type="password" id="password" placeholder="password" />
+        <TextInput 
+        type="password"
+         id="password" 
+         placeholder="password" 
+        onChange={handleChange}/>
 
         <Button type="submit" gradientDuoTone="purpleToBlue" outline>
           Update
